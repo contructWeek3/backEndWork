@@ -2,6 +2,7 @@ package database
 
 import (
 	"commerce/config"
+	ur "commerce/features/user/repository"
 	"fmt"
 
 	"github.com/labstack/gommon/log"
@@ -27,5 +28,5 @@ func InitDB(c *config.AppConfig) *gorm.DB {
 }
 
 func MigrateDB(db *gorm.DB) {
-
+	db.AutoMigrate(&ur.User{})
 }
