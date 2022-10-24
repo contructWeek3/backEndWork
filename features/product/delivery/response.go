@@ -33,22 +33,12 @@ func ToResponses(core interface{}, code string) interface{} {
 	switch code {
 	case "one":
 		val := core.(domain.Cores)
-		res = Responses{ID: val.ID, ProductName: val.ProductName, Description: val.Description, Images: val.Images, Stock: val.Stock, Price: val.Price, UserID: val.UserID, Name: val.Name}
-	case "out":
-		val := core.(domain.Cores)
-		res = Responses{ID: val.ID, ProductName: val.ProductName, Description: val.Description, Images: val.Images, Stock: val.Stock, Price: val.Price}
+		res = Responses{ID: val.ID, ProductName: val.ProductName, Description: val.Description, Images: val.Images, Stock: val.Stock, Price: val.Price, Name: val.Name}
 	case "all":
 		var arr []Responses
 		cnv := core.([]domain.Cores)
 		for _, val := range cnv {
-			arr = append(arr, Responses{ID: val.ID, ProductName: val.ProductName, Description: val.Description, Images: val.Images, Stock: val.Stock, Price: val.Price, UserID: val.UserID, Name: val.Name})
-		}
-		res = arr
-	case "my":
-		var arr []Responses
-		cnv := core.([]domain.Cores)
-		for _, val := range cnv {
-			arr = append(arr, Responses{ID: val.ID, ProductName: val.ProductName, Description: val.Description, Images: val.Images, Stock: val.Stock, Price: val.Price})
+			arr = append(arr, Responses{ID: val.ID, ProductName: val.ProductName, Description: val.Description, Images: val.Images, Stock: val.Stock, Price: val.Price, Name: val.Name})
 		}
 		res = arr
 	}

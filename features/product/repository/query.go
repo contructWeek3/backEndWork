@@ -28,7 +28,7 @@ func (rq *repoQuery) Show() ([]domain.Cores, error) {
 
 func (rq *repoQuery) Spesific(ID int) (domain.Cores, error) {
 	var resQry ProductOut
-	if err := rq.db.Table("products").Select("products.id", "products.product_name", "products.description", "products.images", "products.stock", "products.price", "users.id AS user_id", "users.name").Joins("join users on users.id=products.user_id").Where("products.id = ?", ID).Model(&ProductOut{}).Find(&resQry).Error; err != nil {
+	if err := rq.db.Table("products").Select("products.id", "products.product_name", "products.description", "products.images", "products.stock", "products.price", "users.name").Joins("join users on users.id=products.user_id").Where("products.id = ?", ID).Model(&ProductOut{}).Find(&resQry).Error; err != nil {
 		return domain.Cores{}, err
 	}
 	res := ToDomain(resQry)
@@ -37,7 +37,7 @@ func (rq *repoQuery) Spesific(ID int) (domain.Cores, error) {
 
 func (rq *repoQuery) My(ID uint) ([]domain.Cores, error) {
 	var resQry []ProductOut
-	if err := rq.db.Table("products").Select("id", "product_name", "description", "images", "stock", "price").Where("user_id = ?", ID).Model(&ProductOut{}).Find(&resQry).Error; err != nil {
+	if err := rq.db.Table("products").Select("products.id", "products.product_name", "products.description", "products.images", "products.stock", "products.price", "users.name").Joins("join users on users.id=products.user_id").Where("users.id = ?", ID).Model(&ProductOut{}).Find(&resQry).Error; err != nil {
 		return nil, err
 	}
 	res := ToDomainArrayOut(resQry)
@@ -50,7 +50,7 @@ func (rq *repoQuery) Insert(newProduct domain.Core) (domain.Cores, error) {
 		nil, time.Now(), time.Now(), nil, newProduct.ProductName, newProduct.Description, newProduct.Images, newProduct.Stock, newProduct.Price, newProduct.UserID).Error; err != nil {
 		return domain.Cores{}, err
 	}
-	if er := rq.db.Table("products").Select("id", "product_name", "description", "images", "stock", "price").Where("product_name = ? AND user_id = ?", newProduct.ProductName, newProduct.UserID).Model(&ProductOut{}).Find(&resQry).Error; er != nil {
+	if er := rq.db.Table("products").Select("products.id", "products.product_name", "products.description", "products.images", "products.stock", "products.price", "users.name").Joins("join users on users.id=products.user_id").Where("products.product_name = ? AND products.user_id = ?", newProduct.ProductName, newProduct.UserID).Model(&ProductOut{}).Find(&resQry).Error; er != nil {
 		return domain.Cores{}, er
 	}
 	res := ToDomain(resQry)
@@ -63,7 +63,7 @@ func (rq *repoQuery) Update(ID int, updateProduct domain.Core) (domain.Cores, er
 		time.Now(), updateProduct.ProductName, updateProduct.Description, updateProduct.Images, updateProduct.Stock, updateProduct.Price, ID).Error; err != nil {
 		return domain.Cores{}, err
 	}
-	if er := rq.db.Table("products").Select("id", "product_name", "description", "images", "stock", "price").Where("id = ?", ID).Model(&ProductOut{}).Find(&resQry).Error; er != nil {
+	if er := rq.db.Table("products").Select("products.id", "products.product_name", "products.description", "products.images", "products.stock", "products.price", "users.name").Joins("join users on users.id=products.user_id").Where("products.id = ?", ID).Model(&ProductOut{}).Find(&resQry).Error; er != nil {
 		return domain.Cores{}, er
 	}
 	res := ToDomain(resQry)
