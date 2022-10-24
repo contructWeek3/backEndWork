@@ -2,6 +2,9 @@ package main
 
 import (
 	"commerce/config"
+	pd "commerce/features/product/delivery"
+	pr "commerce/features/product/repository"
+	ps "commerce/features/product/services"
 	ud "commerce/features/user/delivery"
 	ur "commerce/features/user/repository"
 	us "commerce/features/user/services"
@@ -20,6 +23,9 @@ func main() {
 	uRepo := ur.New(db)
 	uService := us.New(uRepo)
 	ud.New(e, uService)
+	pRepo := pr.New(db)
+	pService := ps.New(pRepo)
+	pd.New(e, pService)
 
 	e.Pre(middleware.RemoveTrailingSlash())
 	e.Use(middleware.CORS())
