@@ -1,12 +1,17 @@
 package delivery
 
 import (
-	"commerce/config"
+	cc "commerce/config"
 	"commerce/features/user/domain"
 	"commerce/utils/common"
+	"context"
 	"fmt"
 	"net/http"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -17,9 +22,9 @@ type userHandler struct {
 
 func New(e *echo.Echo, srv domain.Service) {
 	handler := userHandler{srv: srv}
-	e.GET("/users", handler.MyProfile(), middleware.JWT([]byte(config.JwtKey)))
-	e.PUT("/users", handler.UpdateProfile(), middleware.JWT([]byte(config.JwtKey)))
-	e.DELETE("/users", handler.Deactivate(), middleware.JWT([]byte(config.JwtKey)))
+	e.GET("/users", handler.MyProfile(), middleware.JWT([]byte(cc.JwtKey)))
+	e.PUT("/users", handler.UpdateProfile(), middleware.JWT([]byte(cc.JwtKey)))
+	e.DELETE("/users", handler.Deactivate(), middleware.JWT([]byte(cc.JwtKey)))
 	e.POST("/register", handler.Register())
 	e.POST("/login", handler.Login())
 }
@@ -46,16 +51,54 @@ func (uh *userHandler) UpdateProfile() echo.HandlerFunc {
 			return c.JSON(http.StatusUnauthorized, FailResponse("cannot validate token"))
 		} else {
 			var input EditFormat
-			if err := c.Bind(&input); err != nil {
-				return c.JSON(http.StatusBadRequest, FailResponse("cannot bind update data"))
+			cfg, errDef := config.LoadDefaultConfig(context.TODO())
+			if errDef != nil {
+				var erroDef string = "Error: "
+				erroDef += erroDef
+				return c.JSON(http.StatusBadRequest, FailResponse(erroDef))
 			}
 
-			cnv := ToDomain(input)
-			res, err := uh.srv.UpdateProfile(cnv, uint(userID))
-			if err != nil {
-				return c.JSON(http.StatusInternalServerError, FailResponse(err.Error()))
+			client := s3.NewFromConfig(cfg)
+			uploader := manager.NewUploader(client)
+
+			isSuccess := true
+			file, er := c.FormFile("img")
+			if er != nil {
+				isSuccess = false
+			} else {
+				src, err := file.Open()
+				if err != nil {
+					isSuccess = false
+				} else {
+					result, errImg := uploader.Upload(context.TODO(), &s3.PutObjectInput{
+						Bucket: aws.String("project-sosmed"),
+						Key:    aws.String(file.Filename),
+						Body:   src,
+						ACL:    "public-read",
+					})
+
+					if errImg != nil {
+						return c.JSON(http.StatusBadRequest, FailResponse("Berhasil Upload Images"))
+					}
+
+					input.Images = result.Location
+				}
+				defer src.Close()
 			}
-			return c.JSON(http.StatusAccepted, SuccessResponse("Success update user", ToResponse(res, "user")))
+
+			if isSuccess {
+				if err := c.Bind(&input); err != nil {
+					return c.JSON(http.StatusBadRequest, FailResponse("cannot bind update data"))
+				}
+
+				cnv := ToDomain(input)
+				res, err := uh.srv.UpdateProfile(cnv, uint(userID))
+				if err != nil {
+					return c.JSON(http.StatusInternalServerError, FailResponse(err.Error()))
+				}
+				return c.JSON(http.StatusAccepted, SuccessResponse("Success update user", ToResponse(res, "user")))
+			}
+			return c.JSON(http.StatusBadRequest, FailResponse("fail upload file"))
 		}
 	}
 }

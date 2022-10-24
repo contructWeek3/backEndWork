@@ -1,13 +1,18 @@
 package delivery
 
 import (
-	sc "commerce/config"
+	cc "commerce/config"
 	"commerce/features/product/domain"
 	"commerce/utils/common"
+	"context"
 	"net/http"
 	"strconv"
 	"strings"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
@@ -21,10 +26,10 @@ func New(e *echo.Echo, srv domain.Service) {
 	handler := productHandler{srv: srv}
 	e.GET("/products", handler.ShowAllProducts())
 	e.GET("/products/:id", handler.ShowSpesificProduct())
-	e.GET("/products/me", handler.ShowMyProduct(), middleware.JWT([]byte(sc.JwtKey)))
-	e.POST("/products", handler.CreateProduct(), middleware.JWT([]byte(sc.JwtKey)))
-	e.PUT("/products/:id", handler.EditProduct(), middleware.JWT([]byte(sc.JwtKey)))
-	e.DELETE("/products/:id", handler.DeleteProduct(), middleware.JWT([]byte(sc.JwtKey)))
+	e.GET("/products/me", handler.ShowMyProduct(), middleware.JWT([]byte(cc.JwtKey)))
+	e.POST("/products", handler.CreateProduct(), middleware.JWT([]byte(cc.JwtKey)))
+	e.PUT("/products/:id", handler.EditProduct(), middleware.JWT([]byte(cc.JwtKey)))
+	e.DELETE("/products/:id", handler.DeleteProduct(), middleware.JWT([]byte(cc.JwtKey)))
 }
 
 func (ph *productHandler) ShowAllProducts() echo.HandlerFunc {
@@ -77,16 +82,54 @@ func (ph *productHandler) CreateProduct() echo.HandlerFunc {
 		userID := common.ExtractToken(c)
 		input.UserID = int(userID)
 
-		if err := c.Bind(&input); err != nil {
-			return c.JSON(http.StatusBadRequest, FailResponse("cannot bind input"))
-		}
-		cnv := ToDomain(input)
-		res, err := ph.srv.Create(cnv)
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, FailResponse(err.Error()))
+		cfg, errDef := config.LoadDefaultConfig(context.TODO())
+		if errDef != nil {
+			var erroDef string = "Error: "
+			erroDef += erroDef
+			return c.JSON(http.StatusBadRequest, FailResponse(erroDef))
 		}
 
-		return c.JSON(http.StatusCreated, SuccessResponse("Success create new product", ToResponses(res, "out")))
+		client := s3.NewFromConfig(cfg)
+		uploader := manager.NewUploader(client)
+
+		isSuccess := true
+		file, er := c.FormFile("img")
+		if er != nil {
+			isSuccess = false
+		} else {
+			src, err := file.Open()
+			if err != nil {
+				isSuccess = false
+			} else {
+				result, errImg := uploader.Upload(context.TODO(), &s3.PutObjectInput{
+					Bucket: aws.String("project-sosmed"),
+					Key:    aws.String(file.Filename),
+					Body:   src,
+					ACL:    "public-read",
+				})
+
+				if errImg != nil {
+					return c.JSON(http.StatusBadRequest, FailResponse("Berhasil Upload Images"))
+				}
+
+				input.Images = result.Location
+			}
+			defer src.Close()
+		}
+
+		if isSuccess {
+			if err := c.Bind(&input); err != nil {
+				return c.JSON(http.StatusBadRequest, FailResponse("cannot bind input"))
+			}
+			cnv := ToDomain(input)
+			res, err := ph.srv.Create(cnv)
+			if err != nil {
+				return c.JSON(http.StatusInternalServerError, FailResponse(err.Error()))
+			}
+
+			return c.JSON(http.StatusCreated, SuccessResponse("Success create new product", ToResponses(res, "out")))
+		}
+		return c.JSON(http.StatusBadRequest, FailResponse("fail upload file"))
 	}
 }
 
@@ -97,16 +140,54 @@ func (ph *productHandler) EditProduct() echo.HandlerFunc {
 		userID := common.ExtractToken(c)
 		input.UserID = int(userID)
 
-		if err := c.Bind(&input); err != nil {
-			return c.JSON(http.StatusBadRequest, FailResponse("cannot bind input"))
-		}
-		cnv := ToDomain(input)
-		res, err := ph.srv.Edit(ID, cnv)
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, FailResponse(err.Error()))
+		cfg, errDef := config.LoadDefaultConfig(context.TODO())
+		if errDef != nil {
+			var erroDef string = "Error: "
+			erroDef += erroDef
+			return c.JSON(http.StatusBadRequest, FailResponse(erroDef))
 		}
 
-		return c.JSON(http.StatusCreated, SuccessResponse("Success update product", ToResponses(res, "out")))
+		client := s3.NewFromConfig(cfg)
+		uploader := manager.NewUploader(client)
+
+		isSuccess := true
+		file, er := c.FormFile("img")
+		if er != nil {
+			isSuccess = false
+		} else {
+			src, err := file.Open()
+			if err != nil {
+				isSuccess = false
+			} else {
+				result, errImg := uploader.Upload(context.TODO(), &s3.PutObjectInput{
+					Bucket: aws.String("project-sosmed"),
+					Key:    aws.String(file.Filename),
+					Body:   src,
+					ACL:    "public-read",
+				})
+
+				if errImg != nil {
+					return c.JSON(http.StatusBadRequest, FailResponse("Berhasil Upload Images"))
+				}
+
+				input.Images = result.Location
+			}
+			defer src.Close()
+		}
+
+		if isSuccess {
+			if err := c.Bind(&input); err != nil {
+				return c.JSON(http.StatusBadRequest, FailResponse("cannot bind input"))
+			}
+			cnv := ToDomain(input)
+			res, err := ph.srv.Edit(ID, cnv)
+			if err != nil {
+				return c.JSON(http.StatusInternalServerError, FailResponse(err.Error()))
+			}
+
+			return c.JSON(http.StatusCreated, SuccessResponse("Success update product", ToResponses(res, "out")))
+		}
+		return c.JSON(http.StatusBadRequest, FailResponse("fail upload file"))
 	}
 }
 
