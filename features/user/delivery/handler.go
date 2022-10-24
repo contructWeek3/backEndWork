@@ -105,8 +105,8 @@ func (uh *userHandler) Login() echo.HandlerFunc {
 			return c.JSON(http.StatusInternalServerError, FailResponse(err.Error()))
 		}
 
-		tkn := common.GenerateToken(uint(res.ID))
+		res.Token = common.GenerateToken(uint(res.ID))
 
-		return c.JSON(http.StatusAccepted, SuccessLogin("Success to login", ToResponse(res, "res"), tkn))
+		return c.JSON(http.StatusAccepted, SuccessLogin("Success to login", ToResponse(res, "res")))
 	}
 }

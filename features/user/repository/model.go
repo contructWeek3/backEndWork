@@ -15,6 +15,7 @@ type User struct {
 	Address  string
 	Images   string
 	Password string
+	Token    string
 }
 
 func FromDomain(du domain.UserCore) User {
@@ -27,6 +28,7 @@ func FromDomain(du domain.UserCore) User {
 		Address:  du.Address,
 		Images:   du.Images,
 		Password: du.Password,
+		Token:    du.Token,
 	}
 }
 
@@ -40,5 +42,6 @@ func ToDomain(u User) domain.UserCore {
 		Address:  u.Address,
 		Images:   u.Images,
 		Password: u.Password,
+		Token:    u.Token,
 	}
 }

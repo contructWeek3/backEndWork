@@ -9,6 +9,7 @@ type UserCore struct {
 	Address  string
 	Images   string
 	Password string
+	Token    string
 }
 
 type Repository interface {

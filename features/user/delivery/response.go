@@ -4,6 +4,7 @@ import "commerce/features/user/domain"
 
 type Response struct {
 	Username string `json:"username"`
+	Token    string `json: "token"`
 }
 
 type Responses struct {
@@ -20,7 +21,7 @@ func ToResponse(core interface{}, code string) interface{} {
 	switch code {
 	case "res":
 		cnv := core.(domain.UserCore)
-		res = Response{Username: cnv.Username}
+		res = Response{Username: cnv.Username, Token: cnv.Token}
 	case "user":
 		cnv := core.(domain.UserCore)
 		res = Responses{Username: cnv.Username, Email: cnv.Email, Phone: cnv.Phone, Name: cnv.Name, Address: cnv.Address, Images: cnv.Images}
@@ -35,11 +36,10 @@ func SuccessResponse(msg string, data interface{}) map[string]interface{} {
 	}
 }
 
-func SuccessLogin(msg string, data interface{}, token interface{}) map[string]interface{} {
+func SuccessLogin(msg string, data interface{}) map[string]interface{} {
 	return map[string]interface{}{
 		"Message": msg,
 		"Data":    data,
-		"Token":   token,
 	}
 }
 
