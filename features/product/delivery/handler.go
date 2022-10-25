@@ -93,7 +93,7 @@ func (ph *productHandler) CreateProduct() echo.HandlerFunc {
 		uploader := manager.NewUploader(client)
 
 		isSuccess := true
-		file, er := c.FormFile("img")
+		file, er := c.FormFile("images")
 		if er != nil {
 			isSuccess = false
 		} else {
@@ -102,7 +102,7 @@ func (ph *productHandler) CreateProduct() echo.HandlerFunc {
 				isSuccess = false
 			} else {
 				result, errImg := uploader.Upload(context.TODO(), &s3.PutObjectInput{
-					Bucket: aws.String("project-sosmed"),
+					Bucket: aws.String("be12project3bucket"),
 					Key:    aws.String(file.Filename),
 					Body:   src,
 					ACL:    "public-read",
@@ -151,7 +151,7 @@ func (ph *productHandler) EditProduct() echo.HandlerFunc {
 		uploader := manager.NewUploader(client)
 
 		isSuccess := true
-		file, er := c.FormFile("img")
+		file, er := c.FormFile("images")
 		if er != nil {
 			isSuccess = false
 		} else {
@@ -160,7 +160,7 @@ func (ph *productHandler) EditProduct() echo.HandlerFunc {
 				isSuccess = false
 			} else {
 				result, errImg := uploader.Upload(context.TODO(), &s3.PutObjectInput{
-					Bucket: aws.String("project-sosmed"),
+					Bucket: aws.String("be12project3bucket"),
 					Key:    aws.String(file.Filename),
 					Body:   src,
 					ACL:    "public-read",
