@@ -2,6 +2,7 @@ package repository
 
 import (
 	"commerce/features/checkout/domain"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -14,6 +15,19 @@ func New(dbConn *gorm.DB) domain.Repository {
 	return &repoQuery{
 		db: dbConn,
 	}
+}
+
+func (rq *repoQuery) Checkout(newCheckout domain.Core) (domain.Core, error) {
+	var resQry Checkout
+	if err := rq.db.Exec("INSERT INTO checkouts (id, created_at, updated_at, deleted_at, no_invoice, total_all_price, payment_link, payment_token, user_id) values (?,?,?,?,?,?,?,?,?)",
+		nil, time.Now(), time.Now(), nil, newCheckout.NoInvoice, newCheckout.TotalAllPrice, newCheckout.PaymentLink, newCheckout.PaymentToken, newCheckout.UserID).Error; err != nil {
+		return domain.Core{}, err
+	}
+	if er := rq.db.Table("checkouts").Select("id", "no_invoice", "payment_link", "payment_token").Where("no_invoice = ?", newCheckout.NoInvoice).Model(&Checkout{}).Find(&resQry).Error; er != nil {
+		return domain.Core{}, er
+	}
+	res := ToDomain(resQry)
+	return res, nil
 }
 
 func (rq *repoQuery) Purchase(ID uint) ([]domain.Core, error) {

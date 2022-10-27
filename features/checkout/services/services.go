@@ -18,6 +18,20 @@ func New(repo domain.Repository) domain.Service {
 	}
 }
 
+func (cs *CheckoutService) Create(newCheckout domain.Core) (domain.Core, error) {
+	res, err := cs.qry.Checkout(newCheckout)
+
+	if err != nil {
+		if strings.Contains(err.Error(), "duplicate") {
+			return domain.Core{}, errors.New("Rejected from Database")
+		}
+
+		return domain.Core{}, errors.New("Some Problem on Database")
+	}
+
+	return res, nil
+}
+
 func (cs *CheckoutService) ShowPurchase(ID uint) ([]domain.Core, error) {
 	res, err := cs.qry.Purchase(ID)
 	if err != nil {

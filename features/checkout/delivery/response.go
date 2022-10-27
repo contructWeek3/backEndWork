@@ -18,9 +18,16 @@ func FailResponse(msg string) map[string]string {
 	}
 }
 
+type Response struct {
+	ID           uint   `json:"id"`
+	NoInvoice    int    `json:"invoice"`
+	PaymentLink  string `json:"payment_link"`
+	PaymentToken string `json:"payment_token"`
+}
+
 type Responses struct {
 	ID            uint      `json:"id"`
-	NoInvoice     string    `json:"invoice"`
+	NoInvoice     int       `json:"invoice"`
 	TotalAllPrice int       `json:"total_price"`
 	CreatedAt     time.Time `json:"date"`
 }
@@ -28,6 +35,9 @@ type Responses struct {
 func ToResponses(core interface{}, code string) interface{} {
 	var res interface{}
 	switch code {
+	case "out":
+		val := core.(domain.Core)
+		res = Response{ID: val.ID, NoInvoice: val.NoInvoice, PaymentLink: val.PaymentLink, PaymentToken: val.PaymentToken}
 	case "my":
 		var arr []Responses
 		cnv := core.([]domain.Core)

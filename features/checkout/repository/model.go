@@ -8,9 +8,10 @@ import (
 
 type Checkout struct {
 	gorm.Model
-	NoInvoice     string
+	NoInvoice     int
 	TotalAllPrice int
 	PaymentLink   string
+	PaymentToken  string
 	UserID        int
 }
 
@@ -20,6 +21,15 @@ type CheckoutDetail struct {
 	CheckoutID int
 	TotalStock int
 	TotalPrice int
+}
+
+func ToDomain(c Checkout) domain.Core {
+	return domain.Core{
+		Model:        gorm.Model{ID: c.ID, CreatedAt: c.CreatedAt},
+		NoInvoice:    c.NoInvoice,
+		PaymentLink:  c.PaymentLink,
+		PaymentToken: c.PaymentToken,
+	}
 }
 
 func ToDomainArrayOut(ci []Checkout) []domain.Core {
