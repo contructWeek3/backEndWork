@@ -7,6 +7,7 @@ import (
 type InsertCartFormat struct {
 	Stock     int `json:"stock" form:"stock"`
 	ProductID int `json:"product_id" form:"product_id"`
+	UserID    int `json:"user_id" form:"user_id"`
 }
 
 type CartFormat struct {
@@ -22,7 +23,8 @@ func ToDomain(i interface{}) domain.Core {
 		cnv := i.(InsertCartFormat)
 		return domain.Core{
 			ProductID: cnv.ProductID,
-			Stock:     cnv.Stock}
+			Stock:     cnv.Stock,
+			UserID:    cnv.UserID}
 	case CartFormat:
 		cnv := i.(CartFormat)
 		return domain.Core{
