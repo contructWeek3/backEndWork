@@ -2,7 +2,8 @@ package database
 
 import (
 	"commerce/config"
-	rp "commerce/features/product/repository"
+	cr "commerce/features/checkout/repository"
+	pr "commerce/features/product/repository"
 	ur "commerce/features/user/repository"
 	"fmt"
 
@@ -30,5 +31,7 @@ func InitDB(c *config.AppConfig) *gorm.DB {
 
 func MigrateDB(db *gorm.DB) {
 	db.AutoMigrate(&ur.User{})
-	db.AutoMigrate(&rp.Product{})
+	db.AutoMigrate(&pr.Product{})
+	db.AutoMigrate(&cr.Checkout{})
+	db.AutoMigrate(&cr.CheckoutDetail{})
 }
