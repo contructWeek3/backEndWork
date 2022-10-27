@@ -4,7 +4,7 @@ import "commerce/features/user/domain"
 
 type Response struct {
 	Username string `json:"username"`
-	Token    string `json: "token"`
+	Token    string `json:"token"`
 }
 
 type Responses struct {
