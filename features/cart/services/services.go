@@ -13,27 +13,9 @@ type CartService struct {
 }
 
 func New(repo domain.Repository) domain.Service {
-	return &ProductService{
+	return &CartService{
 		qry: repo,
 	}
-}
-
-func (cs *CartService) ShowAll() ([]domain.Cores, error) {
-	res, err := ps.qry.Show()
-	if err != nil {
-		log.Error(err.Error())
-		if strings.Contains(err.Error(), "table") {
-			return nil, errors.New("Database Error")
-		} else if strings.Contains(err.Error(), "found") {
-			return nil, errors.New("No Data")
-		}
-	}
-
-	if len(res) == 0 {
-		log.Info("No Data")
-		return nil, errors.New("No Data")
-	}
-	return res, nil
 }
 
 func (cs *CartService) ShowMyCart(ID uint) ([]domain.Core, error) {
@@ -50,50 +32,36 @@ func (cs *CartService) ShowMyCart(ID uint) ([]domain.Core, error) {
 	return res, nil
 }
 
-func (ps *ProductService) ShowMy(ID uint) ([]domain.Cores, error) {
-	res, err := ps.qry.My(ID)
-	if err != nil {
-		log.Error(err.Error())
-		if strings.Contains(err.Error(), "table") {
-			return nil, errors.New("Database Error")
-		} else if strings.Contains(err.Error(), "found") {
-			return nil, errors.New("No Data")
-		}
-	}
-
-	return res, nil
-}
-
-func (ps *ProductService) Create(newProduct domain.Core) (domain.Cores, error) {
-	res, err := ps.qry.Insert(newProduct)
+func (cs *CartService) AddCart(ProductID, Stock int) (domain.Core, error) {
+	res, err := cs.qry.Insert(ProductID, Stock)
 
 	if err != nil {
 		if strings.Contains(err.Error(), "duplicate") {
-			return domain.Cores{}, errors.New("Rejected from Database")
+			return domain.Core{}, errors.New("Rejected from Database")
 		}
 
-		return domain.Cores{}, errors.New("Some Problem on Database")
+		return domain.Core{}, errors.New("Some Problem on Database")
 	}
 
 	return res, nil
 }
 
-func (ps *ProductService) Edit(ID int, updateProduct domain.Core) (domain.Cores, error) {
-	res, err := ps.qry.Update(ID, updateProduct)
+func (cs *CartService) EditCart(ProductID, Stock int) (domain.Core, error) {
+	res, err := cs.qry.Update(ProductID, Stock)
 
 	if err != nil {
 		if strings.Contains(err.Error(), "duplicate") {
-			return domain.Cores{}, errors.New("Rejected from Database")
+			return domain.Core{}, errors.New("Rejected from Database")
 		}
 
-		return domain.Cores{}, errors.New("Some Problem on Database")
+		return domain.Core{}, errors.New("Some Problem on Database")
 	}
 
 	return res, nil
 }
 
-func (ps *ProductService) Delete(ID int) error {
-	err := ps.qry.Del(ID)
+func (cs *CartService) Delete(ID int) error {
+	err := cs.qry.Del(ID)
 	if err != nil {
 		log.Error(err.Error())
 		if strings.Contains(err.Error(), "table") {

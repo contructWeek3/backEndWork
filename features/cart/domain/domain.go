@@ -27,10 +27,9 @@ type Repository interface {
 }
 
 type Service interface {
-	ShowAll() ([]Core, error)
 	ShowMyCart(ID uint) ([]Core, error)
-	Add(ProductID, Stock int) (Core, error)
-	Edit(ProductID, Stock int) (Core, error)
+	AddCart(ProductID, Stock int) (Core, error)
+	EditCart(ProductID, Stock int) (Core, error)
 	Delete(ID int) error
 }
 
