@@ -1,14 +1,14 @@
 package services
 
 import (
-	"commerce/features/product/domain"
+	"commerce/features/cart/domain"
 	"errors"
 	"strings"
 
 	"github.com/labstack/gommon/log"
 )
 
-type ProductService struct {
+type CartService struct {
 	qry domain.Repository
 }
 
@@ -18,7 +18,7 @@ func New(repo domain.Repository) domain.Service {
 	}
 }
 
-func (ps *ProductService) ShowAll() ([]domain.Cores, error) {
+func (cs *CartService) ShowAll() ([]domain.Cores, error) {
 	res, err := ps.qry.Show()
 	if err != nil {
 		log.Error(err.Error())
@@ -36,14 +36,14 @@ func (ps *ProductService) ShowAll() ([]domain.Cores, error) {
 	return res, nil
 }
 
-func (ps *ProductService) ShowSpesific(ID int) (domain.Cores, error) {
-	res, err := ps.qry.Spesific(ID)
+func (cs *CartService) ShowMyCart(ID uint) ([]domain.Core, error) {
+	res, err := cs.qry.MyCart(ID)
 	if err != nil {
 		log.Error(err.Error())
 		if strings.Contains(err.Error(), "table") {
-			return domain.Cores{}, errors.New("Database Error")
+			return []domain.Core{}, errors.New("Database Error")
 		} else if strings.Contains(err.Error(), "found") {
-			return domain.Cores{}, errors.New("No Data")
+			return []domain.Core{}, errors.New("No Data")
 		}
 	}
 

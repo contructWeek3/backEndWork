@@ -25,7 +25,7 @@ type Responses struct {
 	Product_Price  int    `json:"product_price"`
 	UserID         int    `json:"id_seller"`
 	Name           string `json:"seller"`
-	ProductID      int    `json:"id_product`
+	ProductID      int    `json:"product_id`
 }
 
 func ToResponses(core interface{}, code string) interface{} {

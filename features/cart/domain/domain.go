@@ -7,6 +7,7 @@ import (
 
 type Core struct {
 	gorm.Model
+	ID          uint
 	ProductName string
 	Images      string
 	Stock       int
@@ -19,10 +20,9 @@ type Core struct {
 }
 
 type Repository interface {
-	Show() ([]Core, error)
 	MyCart(ID uint) ([]Core, error)
-	Insert(ProductID int, Stock int) (Core, error)
-	Update(ProductID int, updateData Core) (Core, error)
+	Insert(ProductID, Stock int) (Core, error)
+	Update(ProductID, Stock int) (Core, error)
 	Del(ID int) error
 }
 
@@ -30,7 +30,7 @@ type Service interface {
 	ShowAll() ([]Core, error)
 	ShowMyCart(ID uint) ([]Core, error)
 	Add(ProductID, Stock int) (Core, error)
-	Edit(ProductID int, updateData Core) (Core, error)
+	Edit(ProductID, Stock int) (Core, error)
 	Delete(ID int) error
 }
 
