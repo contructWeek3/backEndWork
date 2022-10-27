@@ -18,6 +18,23 @@ func New(repo domain.Repository) domain.Service {
 	}
 }
 
+func (cs *CartService) ShowAll() ([]domain.Core, error) {
+	res, err := cs.qry.ShowAll()
+	if err != nil {
+		log.Error(err.Error())
+		if strings.Contains(err.Error(), "table") {
+			return nil, errors.New("Database Error")
+		} else if strings.Contains(err.Error(), "found") {
+			return nil, errors.New("No Data")
+		}
+	}
+
+	if len(res) == 0 {
+		log.Info("No Data")
+		return nil, errors.New("No Data")
+	}
+	return res, nil
+}
 func (cs *CartService) ShowMyCart(ID uint) ([]domain.Core, error) {
 	res, err := cs.qry.MyCart(ID)
 	if err != nil {

@@ -20,6 +20,7 @@ type Core struct {
 }
 
 type Repository interface {
+	ShowAll() ([]Core, error)
 	MyCart(ID uint) ([]Core, error)
 	Insert(ProductID, Stock int) (Core, error)
 	Update(ProductID, Stock int) (Core, error)
@@ -27,6 +28,7 @@ type Repository interface {
 }
 
 type Service interface {
+	ShowAll() ([]Core, error)
 	ShowMyCart(ID uint) ([]Core, error)
 	AddCart(ProductID, Stock int) (Core, error)
 	EditCart(ProductID, Stock int) (Core, error)
