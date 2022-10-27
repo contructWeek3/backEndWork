@@ -33,7 +33,7 @@ func (ch *cartHandler) ShowAllCart() echo.HandlerFunc {
 			return c.JSON(http.StatusInternalServerError, FailResponse(err.Error()))
 		}
 
-		return c.JSON(http.StatusOK, SuccessResponse("Success get all products", ToResponses(res, "all")))
+		return c.JSON(http.StatusOK, SuccessResponse("Success get all cart", ToResponses(res, "my")))
 	}
 }
 

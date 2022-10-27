@@ -17,9 +17,18 @@ func New(dbConn *gorm.DB) domain.Repository {
 	}
 }
 
+func (rq *repoQuery) ShowAll() ([]domain.Core, error) {
+	var resQry []Cart
+	if err := rq.db.Table("carts").Select("products.id", "products.product_name", "products.description", "products.images", "products.stock", "products.price", "users.id AS user_id").Joins("join carts on carts.product_id=products.id").Model(&Cart{}).Find(&resQry).Error; err != nil {
+		return nil, err
+	}
+	res := ToDomainArrayOut(resQry)
+	return res, nil
+}
+
 func (rq *repoQuery) MyCart(ID uint) ([]domain.Core, error) {
 	var resQry []Cart
-	if err := rq.db.Table("cart").Select("products.id", "products.product_name", "products.description", "products.images", "products.stock", "products.price", "users.id AS user_id").Joins("join carts on carts.product_id=products.id").Where("user.id = ?", ID).Model(&Cart{}).Find(&resQry).Error; err != nil {
+	if err := rq.db.Table("carts").Select("products.id", "products.product_name", "products.description", "products.images", "products.stock", "products.price", "users.id AS user_id").Joins("join carts on carts.product_id=products.id").Where("user.id = ?", ID).Model(&Cart{}).Find(&resQry).Error; err != nil {
 		return []domain.Core{}, err
 	}
 	res := ToDomainArrayOut(resQry)
@@ -32,7 +41,7 @@ func (rq *repoQuery) Insert(ProductID, Stock int) (domain.Core, error) {
 		nil, time.Now(), time.Now(), nil, ProductID, Stock).Error; err != nil {
 		return domain.Core{}, err
 	}
-	if er := rq.db.Table("cart").Select("product.id", "product_name", "description", "images", "stock", "price").Where("product.id = ?", ProductID).Model(&Cart{}).Find(&resQry).Error; er != nil {
+	if er := rq.db.Table("carts").Select("product.id", "product_name", "description", "images", "stock", "price").Where("product.id = ?", ProductID).Model(&Cart{}).Find(&resQry).Error; er != nil {
 		return domain.Core{}, er
 	}
 	res := ToDomain(resQry)
@@ -45,7 +54,7 @@ func (rq *repoQuery) Update(ProductID, Stock int) (domain.Core, error) {
 		time.Now(), ProductID, Stock, ProductID).Error; err != nil {
 		return domain.Core{}, err
 	}
-	if er := rq.db.Table("cart").Select("product.id", "product_stock").Where("product.id = ?", ProductID).Model(&Cart{}).Find(&resQry).Error; er != nil {
+	if er := rq.db.Table("carts").Select("product.id", "product_stock").Where("product.id = ?", ProductID).Model(&Cart{}).Find(&resQry).Error; er != nil {
 		return domain.Core{}, er
 	}
 	res := ToDomain(resQry)

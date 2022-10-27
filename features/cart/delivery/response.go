@@ -25,7 +25,6 @@ type Responses struct {
 	Product_Price  int    `json:"product_price"`
 	UserID         int    `json:"id_seller"`
 	Name           string `json:"seller"`
-	ProductID      int    `json:"product_id`
 }
 
 func ToResponses(core interface{}, code string) interface{} {
@@ -40,8 +39,7 @@ func ToResponses(core interface{}, code string) interface{} {
 			Product_Stock:  val.Stock,
 			Product_Price:  val.Price,
 			UserID:         val.UserID,
-			Name:           val.Name,
-			ProductID:      val.ProductID}
+			Name:           val.Name}
 	case "my":
 		var arr []Responses
 		cnv := core.([]domain.Core)
@@ -54,7 +52,6 @@ func ToResponses(core interface{}, code string) interface{} {
 				Product_Price:  val.Price,
 				UserID:         val.UserID,
 				Name:           val.Name,
-				ProductID:      val.ProductID,
 			})
 		}
 		res = arr
