@@ -31,20 +31,20 @@ func ToResponse(core interface{}, code string) interface{} {
 
 func SuccessResponse(msg string, data interface{}) map[string]interface{} {
 	return map[string]interface{}{
-		"Message": msg,
-		"Data":    data,
+		"message": msg,
+		"data":    data,
 	}
 }
 
 func SuccessLogin(msg string, data interface{}) map[string]interface{} {
 	return map[string]interface{}{
-		"Message": msg,
-		"Data":    data,
+		"message": msg,
+		"data":    data,
 	}
 }
 
 func FailResponse(msg string) map[string]interface{} {
 	return map[string]interface{}{
-		"Message": msg,
+		"message": msg,
 	}
 }
