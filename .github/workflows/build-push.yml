@@ -39,4 +39,4 @@ jobs:
             sudo docker stop be12project3
             sudo docker rm be12project3
             sudo docker rmi rrw788/be12project3:latest
-            sudo docker run --name be12project3 --link mysqlbe12 -d -p 80:8000 -e DB_USER=${{ secrets.DB_USER }} -e DB_PWD=${{ secrets.DB_PWD }} -e DB_HOST=${{ secrets.DB_HOST }} -e DB_PORT=${{ secrets.DB_PORT }} -e DB_NAME=${{ secrets.DB_NAME }} -e JWT_SECRET=${{ secrets.JWT_SECRET }} -e AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} -e AWS_REGION=${{ secrets.AWS_REGION }} -e AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} rrw788/be12project3
+            sudo docker run --name be12project3 --link mysqlbe12 -d -p 443:8000 -e DB_USER=${{ secrets.DB_USER }} -e DB_PWD=${{ secrets.DB_PWD }} -e DB_HOST=${{ secrets.DB_HOST }} -e DB_PORT=${{ secrets.DB_PORT }} -e DB_NAME=${{ secrets.DB_NAME }} -e JWT_SECRET=${{ secrets.JWT_SECRET }} -e AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} -e AWS_REGION=${{ secrets.AWS_REGION }} -e AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} rrw788/be12project3
